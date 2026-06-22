@@ -11,7 +11,6 @@ Connect your Obsidian vault to Claude Code in 15 minutes. Every session gets aut
 - `/compress` — saves a full session log to `YourVault/CC-Session-Logs/` at the end of every conversation
 - `/preserve` — updates your project's `CLAUDE.md` with key learnings from the session
 - `/resume` — loads your vault context + recent session logs at the start of a new session
-- MCP connection — Claude Code can read and search your vault in real time via the Obsidian Local REST API
 - LLM Wiki Manager (optional) — ingests session logs into a structured, cross-referenced knowledge graph inside Obsidian
 
 ---
@@ -30,7 +29,7 @@ Connect your Obsidian vault to Claude Code in 15 minutes. Every session gets aut
 ### 1. Clone this repo
 
 ```bash
-git clone https://github.com/Mharis-code/obsidian-vault-setup.git
+git clone https://github.com/Mharis-code/obsidianvault.git
 ```
 
 ### 2. Copy the skills into Claude Code
@@ -55,7 +54,7 @@ Open Claude Code in any project and run:
 /obsidian-vault-setup
 ```
 
-The skill will guide you through the rest interactively — vault path, MCP connection, and optional wiki bootstrap.
+The skill will guide you through the rest interactively — vault path and optional wiki bootstrap.
 
 ---
 
@@ -80,7 +79,7 @@ Grow the wiki:
 
 | Skill | Command | What it does |
 |---|---|---|
-| obsidian-vault-setup | `/obsidian-vault-setup` | One-time setup: verifies installs, configures vault path, sets up MCP |
+| obsidian-vault-setup | `/obsidian-vault-setup` | One-time setup: verifies installs, configures vault path, optional wiki bootstrap |
 | compress | `/compress` | Saves full session log to `CC-Session-Logs/` in your vault |
 | preserve | `/preserve` | Updates project `CLAUDE.md` with session learnings |
 | resume | `/resume [N] [keyword]` | Loads CLAUDE.md + last N session summaries, optional topic search |
@@ -95,14 +94,6 @@ After setup, ingest a log by telling Claude:
 ```
 Ingest CC-Session-Logs/22-06-2026-14_30-your-topic.md into the wiki
 ```
-
----
-
-## MCP Connection
-
-The setup creates `~/.claude/.mcp.json` with the Obsidian Local REST API connection. This requires:
-1. The [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin installed in Obsidian
-2. Obsidian open and running during Claude Code sessions
 
 ---
 

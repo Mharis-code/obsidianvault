@@ -1,6 +1,6 @@
 ---
 name: obsidian-vault-setup
-description: Use when setting up Obsidian as a Claude Code knowledge base. Verifies compress/preserve/resume skills are installed, configures session log saving to the vault, sets up the Obsidian MCP connection, and bootstraps the LLM wiki manager for ingesting session logs into a structured knowledge graph.
+description: Use when setting up Obsidian as a Claude Code knowledge base. Verifies compress/preserve/resume skills are installed, configures session log saving to the vault, and bootstraps the LLM wiki manager for ingesting session logs into a structured knowledge graph.
 allowed-tools: Read, Write, Bash, AskUserQuestion, Edit
 argument-hint: [leave blank to start the guided setup]
 ---
@@ -21,11 +21,10 @@ When the user runs `/obsidian-vault-setup`, follow these steps in order. Do not 
 
 Tell the user:
 
-> "This setup takes about 15 minutes and connects your Obsidian vault to Claude Code. Here is what will happen:
+> "This setup connects your Obsidian vault to Claude Code. Here is what will happen:
 > 1. compress, preserve, and resume skills will be verified as installed
 > 2. compress will be configured to save every session log to your vault automatically
-> 3. An MCP config file will be created so Claude Code can read and write your vault directly
-> 4. Optionally: the LLM Wiki Manager skill will be installed to ingest session logs into a structured knowledge base
+> 3. Optionally: the LLM Wiki Manager skill will be installed to ingest session logs into a structured knowledge base
 >
 > Let's start."
 
@@ -161,72 +160,7 @@ Tell the user: "compress configured. All future `/compress` logs will save to `{
 
 ---
 
-### Step 5: Set up the MCP connection
-
-Tell the user:
-
-> "The next step connects Claude Code directly to your Obsidian vault via the Local REST API plugin. This lets Claude read and search your vault in real time.
->
-> Before continuing, do the following in Obsidian:
-> 1. Open Settings → Community plugins
-> 2. Enable community plugins if not already on
-> 3. Click Browse and search for **Local REST API**
-> 4. Install and enable it
-> 5. Open its settings and copy the API key shown there"
-
-Use AskUserQuestion:
-- **question:** "Have you installed the Local REST API plugin and copied your API key?"
-- **header:** "Obsidian plugin"
-- **multiSelect:** false
-- **options:**
-  1. `{ label: "Yes, I have my API key", description: "Paste the key in the next prompt" }`
-  2. `{ label: "Skip for now", description: "Set up the MCP connection later — paste your key into ~/.claude/.mcp.json manually" }`
-
-**If skip:** Create `~/.claude/.mcp.json` with a placeholder:
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "type": "http",
-      "url": "https://127.0.0.1:27124/mcp/",
-      "headers": {
-        "Authorization": "Bearer PASTE_YOUR_API_KEY_HERE"
-      }
-    }
-  }
-}
-```
-Tell the user to replace `PASTE_YOUR_API_KEY_HERE` with their real key once they have it.
-
-**If yes:** Ask the user to type or paste their API key. Store it as `OBSIDIAN_KEY`.
-
-Check if `~/.claude/.mcp.json` already exists:
-```bash
-ls ~/.claude/.mcp.json 2>/dev/null && echo "exists" || echo "missing"
-```
-
-**If the file does not exist:** Write it fresh with the actual key:
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "type": "http",
-      "url": "https://127.0.0.1:27124/mcp/",
-      "headers": {
-        "Authorization": "Bearer {OBSIDIAN_KEY}"
-      }
-    }
-  }
-}
-```
-
-**If the file already exists:** Read it and merge the obsidian server into the existing `mcpServers` block without removing any existing servers.
-
-Tell the user: "MCP config saved. Restart Claude Code to activate the Obsidian connection."
-
----
-
-### Step 6: Install and initialise the LLM Wiki Manager
+### Step 5: Install and initialise the LLM Wiki Manager
 
 Use AskUserQuestion:
 - **question:** "Would you like to install the LLM Wiki Manager skill? This gives Claude the ability to ingest your session logs into a structured, cross-referenced knowledge base that grows over time."
@@ -236,11 +170,11 @@ Use AskUserQuestion:
   1. `{ label: "Yes, install it", description: "Clones the llm-wiki-manager skill and bootstraps the wiki in your vault" }`
   2. `{ label: "Skip for now", description: "You can install it later manually" }`
 
-**If skip:** Move to Step 7.
+**If skip:** Move to Step 6.
 
 **If yes:**
 
-**6a: Install the skill globally**
+**5a: Install the skill globally**
 
 Check if already installed:
 ```bash
@@ -257,18 +191,18 @@ Verify the scripts are present:
 ls ~/.claude/skills/llm-wiki-manager/scripts/init_wiki.py
 ```
 
-If the clone failed or scripts are missing, tell the user to clone it manually and skip to Step 7.
+If the clone failed or scripts are missing, tell the user to clone it manually and skip to Step 6.
 
 Tell the user: "llm-wiki-manager skill installed. It is now available in every Claude Code session."
 
-**6b: Bootstrap the wiki in the vault**
+**5b: Bootstrap the wiki in the vault**
 
 Check if `CLAUDE.md` already exists in the vault:
 ```bash
 ls "{VAULT_PATH}/CLAUDE.md" 2>/dev/null && echo "exists" || echo "missing"
 ```
 
-If it already exists, tell the user the wiki appears to already be initialised and skip to Step 7.
+If it already exists, tell the user the wiki appears to already be initialised and skip to Step 6.
 
 If it does not exist, run the init script:
 ```bash
@@ -297,9 +231,9 @@ Tell the user:
 
 ---
 
-### Step 7: Final summary
+### Step 6: Final summary
 
-Output this confirmation block. Include the wiki row only if Step 6 was completed:
+Output this confirmation block. Include the wiki row only if Step 5 was completed:
 
 ```markdown
 ## Setup Complete
@@ -307,15 +241,12 @@ Output this confirmation block. Include the wiki row only if Step 6 was complete
 ### What was configured
 - `/compress`, `/preserve`, `/resume` — available in every Claude Code session
 - Session logs — saving to `{VAULT_PATH}/CC-Session-Logs/`
-- Obsidian MCP connection — `~/.claude/.mcp.json`
 - LLM wiki structure — `{VAULT_PATH}/wiki/`  ← include only if wiki was set up
 
 ### Next steps
-1. Restart Claude Code to activate the MCP connection
-2. Make sure Obsidian is open before starting a session (MCP requires it running)
-3. Have a conversation, then run `/compress` — your log will appear in Obsidian
-4. Ask Claude: "Can you summarise what's in my CC-Session-Logs folder?" to verify the connection
-5. (If wiki was set up) Run `/compress`, then say: "Ingest CC-Session-Logs/[filename] into the wiki"
+1. Open your Obsidian vault in Claude Code to give it access to vault files
+2. Have a conversation, then run `/compress` — your log will appear in Obsidian
+3. (If wiki was set up) Run `/compress`, then say: "Ingest CC-Session-Logs/[filename] into the wiki"
 
 ### Daily workflow
 Work in Claude Code → `/compress` → `/compact` → ingest log into wiki → next session → `/resume`
