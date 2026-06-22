@@ -17,6 +17,8 @@ sync.ps1                            ← local sync script (gitignored)
 
 ## Source of Truth
 
+GitHub: `https://github.com/Mharis-code/obsidianvault`
+
 The `obsidian-vault-setup/SKILL.md` in this repo is a SYNCED COPY. The source of truth is:
 ```
 c:\Haris\Haris\AI Automations\Haris 2\.claude\skills\obsidian-vault-setup\SKILL.md
